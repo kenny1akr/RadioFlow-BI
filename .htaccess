@@ -1,0 +1,35 @@
+# ============================================================
+# RadioFlow BI — URL Rewrite
+# Transforme /caissier/clients/ajouter
+#        en  /router.php?route=caissier/clients/ajouter
+# ============================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /RadioFlowBI/
+
+    # Ne pas réécrire les fichiers/dossiers qui existent vraiment
+    # (CSS, JS, images, api/, auth/, config/, dash/...)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Ne pas toucher aux accès directs à router.php, index.php, etc.
+    RewriteRule ^(router|index|hash|404)\.php$ - [L]
+
+    # Routes spéciales : api/, auth/, config/ → laisser tel quel
+    RewriteRule ^(api|auth|config|dash|uploads|logs)/ - [L]
+
+    # Toute autre URL → router.php?route=...
+    RewriteRule ^(.+?)/?$ router.php?route=$1 [QSA,L]
+</IfModule>
+
+# Sécurité : empêcher l'accès direct aux fichiers sensibles
+<FilesMatch "\.(sql|log|md|json|lock|ini)$">
+    Require all denied
+</FilesMatch>
+
+# Cacher les fichiers .htaccess eux-mêmes
+<Files ".htaccess">
+    Require all denied
+</Files>
